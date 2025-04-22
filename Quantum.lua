@@ -34,7 +34,7 @@ function Quantum.new(config)
     self.baseTextSize = 48
     
     self.gui = Instance.new("ScreenGui")
-    self.gui.Name = "QuantumInterface"
+    self.gui.Name = "QuantumGUI"
     self.gui.IgnoreGuiInset = true
     self.gui.ResetOnSpawn = false
     self.gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
