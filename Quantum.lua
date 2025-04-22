@@ -62,30 +62,6 @@ function Quantum.new(config)
     self.background.Active = true
     self.background.Parent = self.gui
     
-    self.closeButton = Instance.new("ImageButton")
-    self.closeButton.Name = "CloseButton"
-    self.closeButton.Size = self.closeButtonSize
-    self.closeButton.AnchorPoint = Vector2.new(1, 0)
-    self.closeButton.Position = self.closeButtonPosition
-    self.closeButton.BackgroundTransparency = 1
-    self.closeButton.Image = self.closeButtonImage
-    self.closeButton.ImageColor3 = self.closeButtonColor
-    self.closeButton.Parent = self.gui
-    
-    self.tabsFrame = Instance.new("Frame")
-    self.tabsFrame.Name = "TabsFrame"
-    self.tabsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.tabsFrame.BackgroundTransparency = 1
-    self.tabsFrame.Parent = self.gui
-    
-    self.tabsContainer = Instance.new("Frame")
-    self.tabsContainer.Name = "TabsContainer"
-    self.tabsContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.tabsContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
-    self.tabsContainer.Size = UDim2.new(1, 0, 1, 0)
-    self.tabsContainer.BackgroundTransparency = 1
-    self.tabsContainer.Parent = self.tabsFrame
-
     self.searchTab = Instance.new("Frame")
     self.searchTab.Name = "SearchTab"
     self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
@@ -106,7 +82,7 @@ function Quantum.new(config)
 
     self.searchBox = Instance.new("TextBox")
     self.searchBox.Name = "SearchBox"
-    self.searchBox.Size = UDim2.new(1, 0, 1, 0)
+    self.searchBox.Size = UDim2.new(1, -34, 1, 0)
     self.searchBox.Position = UDim2.new(0, 0, 0, 0)
     self.searchBox.BackgroundTransparency = 1
     self.searchBox.TextColor3 = self.searchTextColor
@@ -117,10 +93,47 @@ function Quantum.new(config)
     self.searchBox.PlaceholderText = "SEARCH..."
     self.searchBox.Parent = self.searchTab
 
+    self.closeButton = Instance.new("ImageButton")
+    self.closeButton.Name = "CloseButton"
+    self.closeButton.Size = self.closeButtonSize
+    self.closeButton.AnchorPoint = Vector2.new(1, 0.5)
+    self.closeButton.Position = UDim2.new(1, -5, 0.5, 0)
+    self.closeButton.BackgroundColor3 = Color3.new(0, 0, 0)
+    self.closeButton.BackgroundTransparency = 0.25
+    self.closeButton.Image = self.closeButtonImage
+    self.closeButton.ImageColor3 = self.closeButtonColor
+    self.closeButton.Parent = self.searchTab
+
+    local closeButtonCorner = Instance.new("UICorner")
+    closeButtonCorner.CornerRadius = UDim.new(0.5, 0)
+    closeButtonCorner.Parent = self.closeButton
+
+    self.closeButton.MouseEnter:Connect(function()
+        self.closeButton.ImageColor3 = Color3.new(1, 0, 0)
+    end)
+
+    self.closeButton.MouseLeave:Connect(function()
+        self.closeButton.ImageColor3 = self.closeButtonColor
+    end)
+
     table.insert(self.labels, self.searchBox)
 
     self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
     
+    self.tabsFrame = Instance.new("Frame")
+    self.tabsFrame.Name = "TabsFrame"
+    self.tabsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.tabsFrame.BackgroundTransparency = 1
+    self.tabsFrame.Parent = self.gui
+    
+    self.tabsContainer = Instance.new("Frame")
+    self.tabsContainer.Name = "TabsContainer"
+    self.tabsContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.tabsContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.tabsContainer.Size = UDim2.new(1, 0, 1, 0)
+    self.tabsContainer.BackgroundTransparency = 1
+    self.tabsContainer.Parent = self.tabsFrame
+
     local numTabs = #self.tabNames
     local totalSpacing = self.spacing * (numTabs - 1)
     local tabWidth = (1 - totalSpacing) / numTabs
@@ -186,13 +199,20 @@ function Quantum.new(config)
     end
 
     self.searchBox.Focused:Connect(function()
-        animateSearchTab(0.25)
+        animateSearchTab(0.2)
     end)
 
     self.searchBox.FocusLost:Connect(function()
         if self.searchBox.Text == "" then
             animateSearchTab(0.1)
         end
+    end)
+
+    self.searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        local targetSize = self.searchBox.Text ~= "" and UDim2.new(0, 0, 0, 0) or self.closeButtonSize
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(self.closeButton, tweenInfo, {Size = targetSize})
+        tween:Play()
     end)
     
     return self
