@@ -31,7 +31,7 @@ function Quantum.new(config)
     self.closeButtonImage = "rbxassetid://9886659671"
     self.closeButtonSize = UDim2.new(0, 24, 0, 24)
     self.closeButtonPosition = UDim2.new(1, -10, 0, 10)
-    self.baseTextSize = 52
+    self.baseTextSize = 48
     
     self.gui = Instance.new("ScreenGui")
     self.gui.Name = "QuantumGUI"
