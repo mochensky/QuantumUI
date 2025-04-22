@@ -113,7 +113,7 @@ function Quantum.new(config)
     self.searchBox.PlaceholderColor3 = self.searchPlaceholderColor
     self.searchBox.TextSize = self:_calculateTextSize()
     self.searchBox.FontFace = self.font
-    self.searchBox.Text = "Search..."
+    self.searchBox.Text = ""
     self.searchBox.PlaceholderText = "Search..."
     self.searchBox.Parent = self.searchTab
 
