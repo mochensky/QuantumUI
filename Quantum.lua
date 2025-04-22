@@ -27,7 +27,7 @@ function Quantum.new(config)
         searchTabBackgroundColor = Color3.new(0, 0, 0),
         searchTabBackgroundTransparency = 0.25,
         searchTextColor = Color3.new(1, 1, 1),
-        searchPlaceholderColor = Color3.new(0.9, 0.9, 0.9),
+        searchPlaceholderColor = Color3.new(0.85, 0.85, 0.85),
         searchStrokeColor = Color3.new(0, 0, 0),
         
         closeButtonColor = Color3.new(1, 1, 1),
@@ -96,7 +96,7 @@ function Quantum.new(config)
     self.searchTab.Parent = self.gui
 
     local searchCorner = Instance.new("UICorner")
-    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale, 0)
+    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale * 2, 0)
     searchCorner.Parent = self.searchTab
 
     local searchStroke = Instance.new("UIStroke")
