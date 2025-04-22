@@ -21,7 +21,8 @@ function Quantum.new(config)
         strokeColor = Color3.new(0, 0, 0),
         textColor = Color3.new(1, 1, 1),
         font = Font.new("rbxassetid://12187607287"),
-        cornerRadius = UDim.new(0, 32)
+        cornerRadiusScale = 0.05,
+        textScaleCoefficient = 0.03
     }
     
     for k, v in pairs(defaultConfig) do
@@ -31,7 +32,6 @@ function Quantum.new(config)
     self.closeButtonImage = "rbxassetid://9886659671"
     self.closeButtonSize = UDim2.new(0, 24, 0, 24)
     self.closeButtonPosition = UDim2.new(1, -10, 0, 10)
-    self.baseTextSize = 48
     
     self.gui = Instance.new("ScreenGui")
     self.gui.Name = "QuantumGUI"
@@ -45,6 +45,7 @@ function Quantum.new(config)
     self.background.Size = UDim2.new(1, 0, 1, 0)
     self.background.BackgroundColor3 = self.backgroundColor
     self.background.BackgroundTransparency = 1
+    self.background.Active = true
     self.background.Parent = self.gui
     
     self.closeButton = Instance.new("ImageButton")
@@ -85,7 +86,7 @@ function Quantum.new(config)
         panel.Parent = self.tabsContainer
         
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = self.cornerRadius
+        corner.CornerRadius = UDim.new(self.cornerRadiusScale, 0)
         corner.Parent = panel
         
         local stroke = Instance.new("UIStroke")
@@ -117,20 +118,16 @@ function Quantum.new(config)
         content.Parent = panel
     end
     
+    self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
+    
     self:_initializeAnimation()
     self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
-    
-    self.background.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        end
-    end)
     
     return self
 end
 
 function Quantum:_calculateTextSize()
-    local containerHeight = self.containerSize.Y.Scale
-    return self.baseTextSize * containerHeight
+    return self.textScaleCoefficient * self.viewportHeight
 end
 
 function Quantum:_initializeAnimation()
