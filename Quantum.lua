@@ -93,7 +93,6 @@ function Quantum.new(config)
     self.searchTab.Size = UDim2.new(0.3, 0, 0.06, 0)
     self.searchTab.BackgroundColor3 = self.searchTabBackgroundColor
     self.searchTab.BackgroundTransparency = self.searchTabBackgroundTransparency
-    self.searchTab.ZIndex = 999
     self.searchTab.Parent = self.gui
 
     local searchCorner = Instance.new("UICorner")
@@ -114,6 +113,7 @@ function Quantum.new(config)
     self.searchBox.PlaceholderColor3 = self.searchPlaceholderColor
     self.searchBox.TextSize = self:_calculateTextSize()
     self.searchBox.FontFace = self.font
+    self.searchBox.Text = "Search..."
     self.searchBox.PlaceholderText = "Search..."
     self.searchBox.Parent = self.searchTab
 
