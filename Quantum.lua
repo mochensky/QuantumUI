@@ -127,6 +127,9 @@ function Quantum.new(config)
 end
 
 function Quantum:_calculateTextSize()
+    if not self.viewportHeight then
+        self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
+    end
     return self.textScaleCoefficient * self.viewportHeight
 end
 
