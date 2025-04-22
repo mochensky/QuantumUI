@@ -77,8 +77,8 @@ function Quantum.new(config)
     self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
     self.searchTab.Position = UDim2.new(0.5, 0, 0.35, 0)
     self.searchTab.Size = UDim2.new(0.3, 0, 0.06, 0)
-    self.searchTab.BackgroundColor3 = Color3.new(1, 0, 0)
-    self.searchTab.BackgroundTransparency = 0
+    self.searchTab.BackgroundColor3 = self.backgroundColor
+    self.searchTab.BackgroundTransparency = self.tabBackgroundTransparency
     self.searchTab.ZIndex = 999
     self.searchTab.Parent = self.gui
 
