@@ -21,7 +21,7 @@ function Quantum.new(config)
         strokeColor = Color3.new(0, 0, 0),
         textColor = Color3.new(1, 1, 1),
         font = Font.new("rbxasset://fonts/families/GothamSSm.json"),
-        cornerRadius = UDim.new(0, 24)
+        cornerRadius = UDim.new(0, 32)
     }
     
     for k, v in pairs(defaultConfig) do
