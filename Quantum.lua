@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 
 local Quantum = {}
@@ -31,11 +30,10 @@ function Quantum.new(config)
         cornerRadiusScale = 0.08,
         textScaleCoefficient = 0.03
     }
-    for key, value in pairs(defaultConfig) do
-        self[key] = (config[key] ~= nil and config[key] or value)
+    for k, v in pairs(defaultConfig) do
+        self[k] = config[k] or v
     end
     self.closeButtonImage = "rbxassetid://9886659671"
-    self.closeButtonSize = UDim2.new(0, 24, 0, 24)
     self.labels = {}
     self.gui = Instance.new("ScreenGui")
     self.gui.Name = "QuantumGUI"
@@ -84,13 +82,14 @@ function Quantum.new(config)
     self.searchBox.Parent = self.searchTab
     table.insert(self.labels, self.searchBox)
 
+    local btnSizeScale = self.searchTab.Size.Y.Scale
     self.closeButton = Instance.new("ImageButton")
     self.closeButton.Name = "CloseButton"
-    self.closeButton.AnchorPoint = Vector2.new(0, 0)
-    self.closeButton.Position = UDim2.new(0.61, 0, 0.1, 0)
-    self.closeButton.Size = self.closeButtonSize
+    self.closeButton.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.closeButton.Size = UDim2.new(0, 0, 0, 0)
+    self.closeButton.Position = UDim2.new(self.searchTab.Position.X.Scale + self.searchTab.Size.X.Scale / 2 + btnSizeScale / 2 + self.spacing, 0, self.searchTab.Position.Y.Scale + btnSizeScale / 2, 0)
     self.closeButton.BackgroundColor3 = self.backgroundColor
-    self.closeButton.BackgroundTransparency = 0.25
+    self.closeButton.BackgroundTransparency = self.backgroundTransparency
     self.closeButton.Image = self.closeButtonImage
     self.closeButton.ImageColor3 = self.closeButtonColor
     self.closeButton.Parent = self.gui
@@ -121,55 +120,9 @@ function Quantum.new(config)
     self.tabsContainer.Parent = self.tabsFrame
 
     self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
-
-    local numTabs = #self.tabNames
-    local totalSpacing = self.spacing * (numTabs - 1)
-    local tabWidth = (1 - totalSpacing) / numTabs
-
-    for index, name in ipairs(self.tabNames) do
-        local panel = Instance.new("Frame")
-        panel.Name = name
-        panel.AnchorPoint = Vector2.new(0, 0.5)
-        panel.Position = UDim2.new((tabWidth + self.spacing) * (index - 1), 0, 0.5, 0)
-        panel.Size = UDim2.new(tabWidth, 0, 1, 0)
-        panel.BackgroundColor3 = self.tabBackgroundColor
-        panel.BackgroundTransparency = self.tabBackgroundTransparency
-        panel.Parent = self.tabsContainer
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(self.cornerRadiusScale, 0)
-        corner.Parent = panel
-
-        local stroke = Instance.new("UIStroke")
-        stroke.Color = self.tabStrokeColor
-        stroke.Thickness = 1
-        stroke.Parent = panel
-
-        local header = Instance.new("Frame")
-        header.Name = "Header"
-        header.Size = UDim2.new(1, 0, 0.15, 0)
-        header.BackgroundTransparency = 1
-        header.Parent = panel
-
-        local label = Instance.new("TextLabel")
-        label.Name = "Label"
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.BackgroundTransparency = 1
-        label.Text = name
-        label.TextColor3 = self.tabTextColor
+    for _, label in ipairs(self.labels) do
         label.TextSize = self:_calculateTextSize()
-        label.FontFace = self.font
-        label.Parent = header
-        table.insert(self.labels, label)
-
-        local content = Instance.new("Frame")
-        content.Name = "Content"
-        content.Size = UDim2.new(1, 0, 0.85, 0)
-        content.Position = UDim2.new(0, 0, 0.15, 0)
-        content.BackgroundTransparency = 1
-        content.Parent = panel
     end
-
     self.viewportConnection = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
         self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
         for _, label in ipairs(self.labels) do
@@ -178,24 +131,25 @@ function Quantum.new(config)
     end)
 
     self:_initializeAnimation()
-    self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
 
-    local function animateSearchTab(width)
+    local function animateSearchTab(widthScale)
         local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local tween = TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(width, 0, 0.06, 0)})
-        tween:Play()
+        TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(widthScale, 0, self.searchTab.Size.Y.Scale, 0)}):Play()
+        local btnSize = self.searchTab.Size.Y.Scale
+        local btnPos = UDim2.new(self.searchTab.Position.X.Scale + widthScale / 2 + btnSize / 2 + self.spacing, 0, self.searchTab.Position.Y.Scale + btnSize / 2, 0)
+        TweenService:Create(self.closeButton, tweenInfo, {Size = UDim2.new(btnSize, 0, btnSize, 0), Position = btnPos}):Play()
     end
 
     self.searchBox.Focused:Connect(function()
         animateSearchTab(0.2)
-        local tween = TweenService:Create(self.closeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 0, 0, 0)})
-        tween:Play()
     end)
 
     self.searchBox.FocusLost:Connect(function()
-        animateSearchTab(self.searchBox.Text == "" and 0.1 or 0.2)
-        local tween = TweenService:Create(self.closeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = self.closeButtonSize})
-        tween:Play()
+        if self.searchBox.Text == "" then
+            animateSearchTab(0.1)
+        else
+            animateSearchTab(0.2)
+        end
     end)
 
     return self
@@ -213,43 +167,22 @@ Quantum._initializeAnimation = function(self)
     self.targetPosition = UDim2.new(0.5, 0, 0.5, 0)
     self.searchTargetSize = UDim2.new(0.1, 0, 0.06, 0)
     self.searchTargetPosition = UDim2.new(0.5, 0, 0.1, 0)
-    if self.animationType == "scale" then
-        self.tabsFrame.Size = UDim2.new(0, 0, 0, 0)
-        self.tabsFrame.Position = self.targetPosition
-        self.searchTab.Size = UDim2.new(0, 0, 0, 0)
-        self.searchTab.Position = self.searchTargetPosition
-    elseif self.animationType == "left" then
-        self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(-self.targetSize.X.Scale / 2, 0, 0.5, 0)
-        self.searchTab.Size = self.searchTargetSize
-        self.searchTab.Position = UDim2.new(-self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)
-    elseif self.animationType == "right" then
-        self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(1 + self.targetSize.X.Scale / 2, 0, 0.5, 0)
-        self.searchTab.Size = self.searchTargetSize
-        self.searchTab.Position = UDim2.new(1 + self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)
-    elseif self.animationType == "top" then
-        self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)
-        self.searchTab.Size = self.searchTargetSize
-        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale * 2, 0)
-    elseif self.animationType == "bottom" then
-        self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)
-        self.searchTab.Size = self.searchTargetSize
-        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale * 2, 0)
-    end
+    self.tabsFrame.Size = (self.animationType == "scale") and UDim2.new(0, 0, 0, 0) or self.targetSize
+    self.tabsFrame.Position = self.targetPosition
+    self.searchTab.Size = (self.animationType == "scale") and UDim2.new(0, 0, 0, 0) or self.searchTargetSize
+    self.searchTab.Position = self.searchTargetPosition
+    self.closeButton.Size = UDim2.new(0, 0, 0, 0)
+    local btnSize = self.searchTargetSize.Y.Scale
+    self.closeButton.Position = UDim2.new(self.searchTargetPosition.X.Scale + self.searchTargetSize.X.Scale / 2 + btnSize / 2 + self.spacing, 0, self.searchTargetPosition.Y.Scale + btnSize / 2, 0)
 end
 
 Quantum.Open = function(self)
     local tweenInfo = TweenInfo.new(self.animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local bgTween = TweenService:Create(self.background, tweenInfo, {BackgroundTransparency = self.backgroundTransparency})
+    TweenService:Create(self.background, tweenInfo, {BackgroundTransparency = self.backgroundTransparency}):Play()
     if self.animationType == "scale" then
-        local sizeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Size = self.targetSize})
-        sizeTween:Play()
+        TweenService:Create(self.tabsFrame, tweenInfo, {Size = self.targetSize}):Play()
     else
-        local positionTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = self.targetPosition})
-        positionTween:Play()
+        TweenService:Create(self.tabsFrame, tweenInfo, {Position = self.targetPosition}):Play()
     end
     local searchTweens = {}
     if self.animationType == "scale" then
@@ -258,56 +191,29 @@ Quantum.Open = function(self)
         table.insert(searchTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = self.searchTargetPosition}))
     end
     table.insert(searchTweens, TweenService:Create(self.searchTab, tweenInfo, {BackgroundTransparency = self.searchTabBackgroundTransparency}))
-    for _, tween in ipairs(searchTweens) do
-        tween:Play()
-    end
-    bgTween:Play()
+    for _, tween in ipairs(searchTweens) do tween:Play() end
+    local btnSize = self.searchTargetSize.Y.Scale
+    local btnPos = UDim2.new(self.searchTargetPosition.X.Scale + self.searchTargetSize.X.Scale / 2 + btnSize / 2 + self.spacing, 0, self.searchTargetPosition.Y.Scale + btnSize / 2, 0)
+    TweenService:Create(self.closeButton, tweenInfo, {Size = UDim2.new(btnSize, 0, btnSize, 0), Position = btnPos}):Play()
 end
 
 Quantum.Close = function(self)
     local tweenInfo = TweenInfo.new(self.animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-    local bgTween = TweenService:Create(self.background, tweenInfo, {BackgroundTransparency = 1})
+    TweenService:Create(self.background, tweenInfo, {BackgroundTransparency = 1}):Play()
     local closeTween
     if self.animationType == "scale" then
         closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Size = UDim2.new(0, 0, 0, 0)})
-    elseif self.animationType == "left" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(-self.targetSize.X.Scale / 2, 0, 0.5, 0)})
-    elseif self.animationType == "right" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(1 + self.targetSize.X.Scale / 2, 0, 0.5, 0)})
-    elseif self.animationType == "top" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)})
-    elseif self.animationType == "bottom" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)})
+    else
+        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = self.targetPosition})
     end
-    local searchCloseTweens = {}
-    if self.animationType == "scale" then
-        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(0, 0, 0, 0)}))
-    elseif self.animationType == "left" then
-        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(-self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)}))
-    elseif self.animationType == "right" then
-        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(1 + self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)}))
-    elseif self.animationType == "top" then
-        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale, 0)}))
-    elseif self.animationType == "bottom" then
-        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale, 0)}))
-    end
-    table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {BackgroundTransparency = 1}))
-    for _, tween in ipairs(searchCloseTweens) do
-        tween:Play()
-    end
-    if closeTween then
-        closeTween:Play()
-        closeTween.Completed:Connect(function()
-            self.gui:Destroy()
-        end)
-    end
-    bgTween:Play()
+    closeTween:Play()
+    TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}):Play()
+    TweenService:Create(self.closeButton, tweenInfo, {Size = UDim2.new(0, 0, 0, 0)}):Play()
+    closeTween.Completed:Connect(function() self.gui:Destroy() end)
 end
 
 Quantum.Destroy = function(self)
-    if self.viewportConnection then
-        self.viewportConnection:Disconnect()
-    end
+    if self.viewportConnection then self.viewportConnection:Disconnect() end
     self.gui:Destroy()
 end
 
