@@ -165,6 +165,7 @@ function Quantum.new(config)
         content.Name = "Content"
         content.Size = UDim2.new(0.9, 0, 0.875, 0)
         content.Position = UDim2.new(0.055, 0, 0.1, 0)
+        content.BackgroundColor3 = self.tabBackgroundColor
         content.BackgroundTransparency = 0.5
         content.Parent = panel
 
