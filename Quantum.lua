@@ -152,7 +152,7 @@ function Quantum.new(config)
         
         local label = Instance.new("TextLabel")
         label.Name = "Label"
-        label.Size = UDim2.new(1, 0, 1, 0)
+        label.Size = UDim2.new(0.9, 0, 0.8, 0)
         label.BackgroundTransparency = 1
         label.Text = name
         label.TextColor3 = self.tabTextColor
