@@ -146,7 +146,7 @@ function Quantum.new(config)
         
         local header = Instance.new("Frame")
         header.Name = "Header"
-        header.Size = UDim2.new(1, 0, 0.15, 0)
+        header.Size = UDim2.new(1, 0, 0.1, 0)
         header.BackgroundTransparency = 1
         header.Parent = panel
         
@@ -163,10 +163,15 @@ function Quantum.new(config)
         
         local content = Instance.new("Frame")
         content.Name = "Content"
-        content.Size = UDim2.new(1, 0, 0.85, 0)
-        content.Position = UDim2.new(0, 0, 0.15, 0)
-        content.BackgroundTransparency = 1
+        content.Size = UDim2.new(0.9, 0, 0.875, 0)
+        content.Position = UDim2.new(0.055, 0, 0.1, 0)
+        content.BackgroundTransparency = 0.5
+        content.BakcgroundColor3 = self.tabBackgroundColor
         content.Parent = panel
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(self.cornerRadiusScale, 0)
+        corner.Parent = content
     end
 
     self.viewportConnection = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
