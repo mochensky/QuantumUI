@@ -70,6 +70,8 @@ function Quantum.new(config)
     self.tabsContainer.Size = UDim2.new(1, 0, 1, 0)
     self.tabsContainer.BackgroundTransparency = 1
     self.tabsContainer.Parent = self.tabsFrame
+
+    self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
     
     local numTabs = #self.tabNames
     local totalSpacing = self.spacing * (numTabs - 1)
@@ -117,8 +119,6 @@ function Quantum.new(config)
         content.BackgroundTransparency = 1
         content.Parent = panel
     end
-    
-    self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
     
     self:_initializeAnimation()
     self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
