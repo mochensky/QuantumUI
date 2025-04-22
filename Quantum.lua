@@ -96,7 +96,7 @@ function Quantum.new(config)
     self.searchTab.Parent = self.gui
 
     local searchCorner = Instance.new("UICorner")
-    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale * 8, 0)
+    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale * 10, 0)
     searchCorner.Parent = self.searchTab
 
     local searchStroke = Instance.new("UIStroke")
