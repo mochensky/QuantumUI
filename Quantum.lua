@@ -45,7 +45,6 @@ function Quantum.new(config)
     self.background.Size = UDim2.new(1, 0, 1, 0)
     self.background.BackgroundColor3 = self.backgroundColor
     self.background.BackgroundTransparency = 1
-    self.background.ZIndex = self.zIndex
     self.background.Parent = self.gui
     
     self.closeButton = Instance.new("ImageButton")
@@ -54,7 +53,6 @@ function Quantum.new(config)
     self.closeButton.AnchorPoint = Vector2.new(1, 0)
     self.closeButton.Position = self.closeButtonPosition
     self.closeButton.BackgroundTransparency = 1
-    self.closeButton.Image = self.closeButtonImage
     self.closeButton.ZIndex = self.zIndex + 1
     self.closeButton.Parent = self.gui
     
