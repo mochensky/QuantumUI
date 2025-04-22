@@ -34,7 +34,7 @@ function Quantum.new(config)
         
         strokeColor = Color3.new(0, 0, 0),
         font = Font.new("rbxassetid://12187607287"),
-        cornerRadiusScale = 0.07,
+        cornerRadiusScale = 0.47,
         textScaleCoefficient = 0.03
     }
     
