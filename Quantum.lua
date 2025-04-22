@@ -12,7 +12,7 @@ function Quantum.new(config)
     local defaultConfig = {
         animationType = "scale",
         animationDuration = 0.15,
-        tabNames = {"Combat", "Misc", "Settings"},
+        tabNames = {"Test"},
         spacing = 0.02,
         containerSize = UDim2.new(0.9, 0, 0.6, 0),
         backgroundTransparency = 0.25,
@@ -32,6 +32,7 @@ function Quantum.new(config)
     self.closeButtonImage = "rbxassetid://9886659671"
     self.closeButtonSize = UDim2.new(0, 24, 0, 24)
     self.closeButtonPosition = UDim2.new(1, -10, 0, 10)
+    self.labels = {}
     
     self.gui = Instance.new("ScreenGui")
     self.gui.Name = "QuantumGUI"
@@ -111,6 +112,7 @@ function Quantum.new(config)
         label.TextSize = self:_calculateTextSize()
         label.FontFace = self.font
         label.Parent = header
+        table.insert(self.labels, label)
         
         local content = Instance.new("Frame")
         content.Name = "Content"
@@ -119,6 +121,13 @@ function Quantum.new(config)
         content.BackgroundTransparency = 1
         content.Parent = panel
     end
+    
+    self.viewportConnection = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+        self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
+        for _, label in ipairs(self.labels) do
+            label.TextSize = self:_calculateTextSize()
+        end
+    end)
     
     self:_initializeAnimation()
     self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
@@ -130,7 +139,6 @@ function Quantum:_calculateTextSize()
     if not self.viewportHeight then
         self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
     end
-    print(workspace.CurrentCamera.ViewportSize.Y)
     return self.textScaleCoefficient * self.viewportHeight
 end
 
@@ -198,6 +206,9 @@ function Quantum:Close()
 end
 
 function Quantum:Destroy()
+    if self.viewportConnection then
+        self.viewportConnection:Disconnect()
+    end
     self.gui:Destroy()
 end
 
