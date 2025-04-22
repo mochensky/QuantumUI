@@ -20,7 +20,7 @@ function Quantum.new(config)
         tabBackgroundTransparency = 0.25,
         strokeColor = Color3.new(0, 0, 0),
         textColor = Color3.new(1, 1, 1),
-        font = Font.new("rbxassetid://11702779517"),
+        font = Font.new("rbxassetid://12187607287"),
         cornerRadius = UDim.new(0, 32)
     }
     
