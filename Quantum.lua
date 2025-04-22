@@ -166,7 +166,6 @@ function Quantum.new(config)
         content.Size = UDim2.new(0.9, 0, 0.875, 0)
         content.Position = UDim2.new(0.055, 0, 0.1, 0)
         content.BackgroundTransparency = 0.5
-        content.BakcgroundColor3 = self.tabBackgroundColor
         content.Parent = panel
 
         local corner = Instance.new("UICorner")
