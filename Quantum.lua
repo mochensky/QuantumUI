@@ -14,7 +14,7 @@ function Quantum.new(config)
         animationDuration = 0.15,
         tabNames = {"Combat", "Misc", "Settings"},
         spacing = 0.02,
-        containerSize = UDim2.new(0.9, 0, 0.6, 0),
+        containerSize = UDim2.new(0.9, 0, 0.1, 0),
         backgroundTransparency = 0.25,
         backgroundColor = Color3.new(0, 0, 0),
         tabBackgroundTransparency = 0.25,
