@@ -27,7 +27,7 @@ function Quantum.new(config)
         searchTabBackgroundColor = Color3.new(0, 0, 0),
         searchTabBackgroundTransparency = 0.25,
         searchTextColor = Color3.new(1, 1, 1),
-        searchPlaceholderColor = Color3.new(0.85, 0.85, 0.85),
+        searchPlaceholderColor = Color3.new(0.7, 0.7, 0.7),
         searchStrokeColor = Color3.new(0, 0, 0),
         
         closeButtonColor = Color3.new(1, 1, 1),
