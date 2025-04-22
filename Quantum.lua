@@ -72,6 +72,37 @@ function Quantum.new(config)
     self.tabsContainer.BackgroundTransparency = 1
     self.tabsContainer.Parent = self.tabsFrame
 
+    self.searchTab = Instance.new("Frame")
+    self.searchTab.Name = "SearchTab"
+    self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
+    self.searchTab.Position = UDim2.new(0.5, 0, 0.4, 0)
+    self.searchTab.Size = UDim2.new(0.2, 0, 0.05, 0)
+    self.searchTab.BackgroundColor3 = self.backgroundColor
+    self.searchTab.BackgroundTransparency = self.tabBackgroundTransparency
+    self.searchTab.ZIndex = 2
+    self.searchTab.Parent = self.gui
+
+    local searchCorner = Instance.new("UICorner")
+    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale, 0)
+    searchCorner.Parent = self.searchTab
+
+    local searchStroke = Instance.new("UIStroke")
+    searchStroke.Color = self.strokeColor
+    searchStroke.Thickness = 1
+    searchStroke.Parent = self.searchTab
+
+    self.searchBox = Instance.new("TextBox")
+    self.searchBox.Name = "SearchBox"
+    self.searchBox.Size = UDim2.new(1, 0, 1, 0)
+    self.searchBox.BackgroundTransparency = 1
+    self.searchBox.TextColor3 = self.textColor
+    self.searchBox.TextSize = self:_calculateTextSize()
+    self.searchBox.FontFace = self.font
+    self.searchBox.PlaceholderText = "Search..."
+    self.searchBox.Parent = self.searchTab
+
+    table.insert(self.labels, self.searchBox)
+
     self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
     
     local numTabs = #self.tabNames
@@ -131,6 +162,22 @@ function Quantum.new(config)
     
     self:_initializeAnimation()
     self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
+
+    local function animateSearchTab(width)
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(width, 0, 0.05, 0)})
+        tween:Play()
+    end
+
+    self.searchBox.Focused:Connect(function()
+        animateSearchTab(0.4)
+    end)
+
+    self.searchBox.FocusLost:Connect(function()
+        if self.searchBox.Text == "" then
+            animateSearchTab(0.2)
+        end
+    end)
     
     return self
 end
