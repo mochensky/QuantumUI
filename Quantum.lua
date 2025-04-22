@@ -23,7 +23,7 @@ function Quantum.new(config)
         tabBackgroundTransparency = 0.25,
         strokeColor = Color3.new(0, 0, 0),
         textColor = Color3.new(1, 1, 1),
-        baseTextSize = 20,
+        baseTextSize = 48,
         font = Font.new("rbxasset://fonts/families/GothamSSm.json"),
         cornerRadius = UDim.new(0, 24),
         zIndex = 1000
