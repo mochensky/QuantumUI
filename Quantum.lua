@@ -33,7 +33,7 @@ function Quantum.new(config)
         closeButtonColor = Color3.new(1, 1, 1),
         
         strokeColor = Color3.new(0, 0, 0),
-        font = Font.new("rbxassetid://12187607287"),
+        font = Font.new("rbxassetid://11702779517"),
         cornerRadiusScale = 0.08,
         textScaleCoefficient = 0.03
     }
@@ -114,7 +114,7 @@ function Quantum.new(config)
     self.searchBox.TextSize = self:_calculateTextSize()
     self.searchBox.FontFace = self.font
     self.searchBox.Text = ""
-    self.searchBox.PlaceholderText = "Search..."
+    self.searchBox.PlaceholderText = "SEARCH..."
     self.searchBox.Parent = self.searchTab
 
     table.insert(self.labels, self.searchBox)
