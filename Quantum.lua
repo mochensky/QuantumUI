@@ -10,8 +10,8 @@ local Quantum = {}
 Quantum.__index = Quantum
 
 local camera = Workspace.CurrentCamera
-local BLUR_SIZE = Vector2.new(10, 10)
-local PART_SIZE = 0.01
+local BLUR_SIZE = Vector2.new(5, 5)
+local PART_SIZE = 1
 local PART_TRANSPARENCY = 1 - 1e-7
 local BLUR_OBJ = Instance.new("DepthOfFieldEffect")
 BLUR_OBJ.FarIntensity = 0
@@ -54,7 +54,7 @@ local function applyBlur(frame, intensity)
         blurPart.Transparency = PART_TRANSPARENCY
 
         local corner0 = frame.AbsolutePosition + BLUR_SIZE
-        local corner1 = corner0 + frame.AbsoluteSize - BLUR_SIZE * 2
+        local corner1 = frame.AbsolutePosition + frame.AbsoluteSize - BLUR_SIZE
 
         local ray0, ray1
         if ignoreInset then
@@ -84,7 +84,7 @@ local function applyBlur(frame, intensity)
         local center = (pos0 + pos1)/2
 
         mesh.Offset = center
-        mesh.Scale = size / PART_SIZE
+        mesh.Scale = size
     end
 
     table.insert(PartsList, blurPart)
@@ -216,7 +216,7 @@ function Quantum.new(config)
         self.searchTab.Parent = self.gui
 
         local searchCorner = Instance.new("UICorner")
-        searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale * 10, 0)
+        searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale, 0)
         searchCorner.Parent = self.searchTab
 
         local searchStroke = Instance.new("UIStroke")
@@ -443,13 +443,13 @@ Quantum.Close = function(self)
         if self.animationType == "scale" then
             table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(0, 0, 0, 0)}))
         elseif self.animationType == "left" then
-            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(-self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)}))
+            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(-self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)})
         elseif self.animationType == "right" then
-            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(1 + self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)}))
+            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(1 + self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)})
         elseif self.animationType == "top" then
-            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale, 0)}))
+            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale, 0)})
         elseif self.animationType == "bottom" then
-            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale, 0)}))
+            table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale, 0)})
         end
         table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {BackgroundTransparency = 1}))
         
