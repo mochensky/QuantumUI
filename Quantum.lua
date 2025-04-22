@@ -15,11 +15,24 @@ function Quantum.new(config)
         tabNames = {"Test"},
         spacing = 0.02,
         containerSize = UDim2.new(0.9, 0, 0.6, 0),
-        backgroundTransparency = 0.25,
+        
         backgroundColor = Color3.new(0, 0, 0),
+        backgroundTransparency = 0.25,
+        
+        tabBackgroundColor = Color3.new(0.1, 0.1, 0.1),
         tabBackgroundTransparency = 0.25,
+        tabTextColor = Color3.new(1, 1, 1),
+        tabStrokeColor = Color3.new(0, 0, 0),
+        
+        searchTabBackgroundColor = Color3.new(0.1, 0.1, 0.1),
+        searchTabBackgroundTransparency = 0.25,
+        searchTextColor = Color3.new(1, 1, 1),
+        searchPlaceholderColor = Color3.new(0.7, 0.7, 0.7),
+        searchStrokeColor = Color3.new(0, 0, 0),
+        
+        closeButtonColor = Color3.new(1, 1, 1),
+        
         strokeColor = Color3.new(0, 0, 0),
-        textColor = Color3.new(1, 1, 1),
         font = Font.new("rbxassetid://12187607287"),
         cornerRadiusScale = 0.07,
         textScaleCoefficient = 0.03
@@ -56,6 +69,7 @@ function Quantum.new(config)
     self.closeButton.Position = self.closeButtonPosition
     self.closeButton.BackgroundTransparency = 1
     self.closeButton.Image = self.closeButtonImage
+    self.closeButton.ImageColor3 = self.closeButtonColor
     self.closeButton.Parent = self.gui
     
     self.tabsFrame = Instance.new("Frame")
@@ -75,10 +89,10 @@ function Quantum.new(config)
     self.searchTab = Instance.new("Frame")
     self.searchTab.Name = "SearchTab"
     self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
-    self.searchTab.Position = UDim2.new(0.5, 0, 0.35, 0)
+    self.searchTab.Position = UDim2.new(0.5, 0, 0.1, 0)
     self.searchTab.Size = UDim2.new(0.3, 0, 0.06, 0)
-    self.searchTab.BackgroundColor3 = self.backgroundColor
-    self.searchTab.BackgroundTransparency = self.tabBackgroundTransparency
+    self.searchTab.BackgroundColor3 = self.searchTabBackgroundColor
+    self.searchTab.BackgroundTransparency = self.searchTabBackgroundTransparency
     self.searchTab.ZIndex = 999
     self.searchTab.Parent = self.gui
 
@@ -87,7 +101,7 @@ function Quantum.new(config)
     searchCorner.Parent = self.searchTab
 
     local searchStroke = Instance.new("UIStroke")
-    searchStroke.Color = self.strokeColor
+    searchStroke.Color = self.searchStrokeColor
     searchStroke.Thickness = 2
     searchStroke.Parent = self.searchTab
 
@@ -96,7 +110,8 @@ function Quantum.new(config)
     self.searchBox.Size = UDim2.new(0.9, 0, 0.8, 0)
     self.searchBox.Position = UDim2.new(0.05, 0, 0.1, 0)
     self.searchBox.BackgroundTransparency = 1
-    self.searchBox.TextColor3 = self.textColor
+    self.searchBox.TextColor3 = self.searchTextColor
+    self.searchBox.PlaceholderColor3 = self.searchPlaceholderColor
     self.searchBox.TextSize = self:_calculateTextSize()
     self.searchBox.FontFace = self.font
     self.searchBox.PlaceholderText = "Search..."
@@ -116,7 +131,7 @@ function Quantum.new(config)
         panel.AnchorPoint = Vector2.new(0, 0.5)
         panel.Position = UDim2.new((tabWidth + self.spacing) * (i - 1), 0, 0.5, 0)
         panel.Size = UDim2.new(tabWidth, 0, 1, 0)
-        panel.BackgroundColor3 = self.backgroundColor
+        panel.BackgroundColor3 = self.tabBackgroundColor
         panel.BackgroundTransparency = self.tabBackgroundTransparency
         panel.Parent = self.tabsContainer
         
@@ -125,7 +140,7 @@ function Quantum.new(config)
         corner.Parent = panel
         
         local stroke = Instance.new("UIStroke")
-        stroke.Color = self.strokeColor
+        stroke.Color = self.tabStrokeColor
         stroke.Thickness = 1
         stroke.Parent = panel
         
@@ -140,7 +155,7 @@ function Quantum.new(config)
         label.Size = UDim2.new(1, 0, 1, 0)
         label.BackgroundTransparency = 1
         label.Text = name
-        label.TextColor3 = self.textColor
+        label.TextColor3 = self.tabTextColor
         label.TextSize = self:_calculateTextSize()
         label.FontFace = self.font
         label.Parent = header
@@ -153,7 +168,7 @@ function Quantum.new(config)
         content.BackgroundTransparency = 1
         content.Parent = panel
     end
-    
+
     self.viewportConnection = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
         self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
         for _, label in ipairs(self.labels) do
@@ -163,7 +178,7 @@ function Quantum.new(config)
     
     self:_initializeAnimation()
     self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
-
+    
     local function animateSearchTab(width)
         local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         local tween = TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(width, 0, 0.06, 0)})
