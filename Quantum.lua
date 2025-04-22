@@ -29,8 +29,20 @@ function Quantum.new(config)
         zIndex = 1000
     }
     
+    local nonEditableParams = {
+        "closeButtonImage",
+        "closeButtonSize",
+        "closeButtonPosition",
+        "baseTextSize",
+        "zIndex"
+    }
+    
     for k, v in pairs(defaultConfig) do
-        self[k] = config[k] or v
+        if table.find(nonEditableParams, k) then
+            self[k] = v
+        else
+            self[k] = config[k] or v
+        end
     end
     
     self.gui = Instance.new("ScreenGui")
@@ -46,6 +58,7 @@ function Quantum.new(config)
     self.background.BackgroundColor3 = self.backgroundColor
     self.background.BackgroundTransparency = 1
     self.background.ZIndex = self.zIndex
+    self.background.Active = true
     self.background.Parent = self.gui
     
     self.closeButton = Instance.new("ImageButton")
