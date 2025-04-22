@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local Quantum = {}
 Quantum.__index = Quantum
@@ -13,7 +14,7 @@ function Quantum.new(config)
         animationDuration = 0.15,
         tabNames = {"Combat", "Misc", "Settings"},
         spacing = 0.02,
-        containerHeight = 0.6,
+        containerSize = UDim2.new(0.9, 0, 0.6, 0),
         backgroundTransparency = 0.25,
         closeButtonImage = "rbxassetid://9886659671",
         closeButtonSize = UDim2.new(0, 24, 0, 24),
@@ -22,8 +23,10 @@ function Quantum.new(config)
         tabBackgroundTransparency = 0.25,
         strokeColor = Color3.new(0, 0, 0),
         textColor = Color3.new(1, 1, 1),
-        textSize = 20,
-        font = Font.new("rbxasset://fonts/families/GothamSSm.json")
+        baseTextSize = 20,
+        font = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+        cornerRadius = UDim.new(0, 24),
+        zIndex = 1000
     }
     
     for k, v in pairs(defaultConfig) do
@@ -34,6 +37,7 @@ function Quantum.new(config)
     self.gui.Name = "QuantumInterface"
     self.gui.IgnoreGuiInset = true
     self.gui.ResetOnSpawn = false
+    self.gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
     self.gui.Parent = player:WaitForChild("PlayerGui")
     
     self.background = Instance.new("Frame")
@@ -41,7 +45,7 @@ function Quantum.new(config)
     self.background.Size = UDim2.new(1, 0, 1, 0)
     self.background.BackgroundColor3 = self.backgroundColor
     self.background.BackgroundTransparency = 1
-    self.background.ZIndex = 1
+    self.background.ZIndex = self.zIndex
     self.background.Parent = self.gui
     
     self.closeButton = Instance.new("ImageButton")
@@ -51,7 +55,7 @@ function Quantum.new(config)
     self.closeButton.Position = self.closeButtonPosition
     self.closeButton.BackgroundTransparency = 1
     self.closeButton.Image = self.closeButtonImage
-    self.closeButton.ZIndex = 2
+    self.closeButton.ZIndex = self.zIndex + 1
     self.closeButton.Parent = self.gui
     
     self.tabsFrame = Instance.new("Frame")
@@ -80,11 +84,11 @@ function Quantum.new(config)
         panel.Size = UDim2.new(tabWidth, 0, 1, 0)
         panel.BackgroundColor3 = self.backgroundColor
         panel.BackgroundTransparency = self.tabBackgroundTransparency
-        panel.ZIndex = 1
+        panel.ZIndex = self.zIndex
         panel.Parent = self.tabsContainer
         
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 24)
+        corner.CornerRadius = self.cornerRadius
         corner.Parent = panel
         
         local stroke = Instance.new("UIStroke")
@@ -104,7 +108,7 @@ function Quantum.new(config)
         label.BackgroundTransparency = 1
         label.Text = name
         label.TextColor3 = self.textColor
-        label.TextSize = self.textSize
+        label.TextSize = self:_calculateTextSize()
         label.FontFace = self.font
         label.Parent = header
         
@@ -118,11 +122,22 @@ function Quantum.new(config)
     
     self:_initializeAnimation()
     self.closeButton.MouseButton1Click:Connect(function() self:Close() end)
+    
+    self.background.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        end
+    end)
+    
     return self
 end
 
+function Quantum:_calculateTextSize()
+    local containerHeight = self.containerSize.Y.Scale
+    return self.baseTextSize * containerHeight
+end
+
 function Quantum:_initializeAnimation()
-    self.targetSize = UDim2.new(0.9, 0, self.containerHeight, 0)
+    self.targetSize = self.containerSize
     self.targetPosition = UDim2.new(0.5, 0, 0.5, 0)
     
     if self.animationType == "scale" then
@@ -130,16 +145,16 @@ function Quantum:_initializeAnimation()
         self.tabsFrame.Position = self.targetPosition
     elseif self.animationType == "left" then
         self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(-0.45, 0, 0.5, 0)
+        self.tabsFrame.Position = UDim2.new(-self.targetSize.X.Scale / 2, 0, 0.5, 0)
     elseif self.animationType == "right" then
         self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(1.45, 0, 0.5, 0)
+        self.tabsFrame.Position = UDim2.new(1 + self.targetSize.X.Scale / 2, 0, 0.5, 0)
     elseif self.animationType == "top" then
         self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(0.5, 0, -0.3, 0)
+        self.tabsFrame.Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)
     elseif self.animationType == "bottom" then
         self.tabsFrame.Size = self.targetSize
-        self.tabsFrame.Position = UDim2.new(0.5, 0, 1.3, 0)
+        self.tabsFrame.Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)
     end
 end
 
@@ -166,13 +181,13 @@ function Quantum:Close()
     if self.animationType == "scale" then
         closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Size = UDim2.new(0, 0, 0, 0)})
     elseif self.animationType == "left" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(-0.45, 0, 0.5, 0)})
+        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(-self.targetSize.X.Scale / 2, 0, 0.5, 0)})
     elseif self.animationType == "right" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(1.45, 0, 0.5, 0)})
+        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(1 + self.targetSize.X.Scale / 2, 0, 0.5, 0)})
     elseif self.animationType == "top" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, -0.3, 0)})
+        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)})
     elseif self.animationType == "bottom" then
-        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, 1.3, 0)})
+        closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)})
     end
     
     if closeTween then
