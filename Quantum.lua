@@ -3,148 +3,175 @@ QuantumUI.__index = QuantumUI
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local player = Players.LocalPlayer
 
-function QuantumUI.new(config)
+local spacingScale = 0.02
+local containerHeightScale = 0.6
+
+function QuantumUI.new()
     local self = setmetatable({}, QuantumUI)
+    self.categories = {}
+    self.tabPanels = {}
     
-    self.Gui = Instance.new("ScreenGui")
-    self.Gui.Name = "QuantumUI"
-    self.Gui.IgnoreGuiInset = true
-    self.Gui.ResetOnSpawn = false
-    self.Gui.Parent = player:WaitForChild("PlayerGui")
+    local player = Players.LocalPlayer
+    self.gui = Instance.new("ScreenGui")
+    self.gui.Name = "QuantumUI"
+    self.gui.IgnoreGuiInset = true
+    self.gui.ResetOnSpawn = false
+    self.gui.Parent = player:WaitForChild("PlayerGui")
 
-    self.Tabs = {}
-    self.CurrentTab = nil
-    self.Config = {
-        BackgroundTransparency = config.BackgroundTransparency or 0.25,
-        TabHeightScale = config.TabHeightScale or 0.6,
-        AnimationDuration = config.AnimationDuration or 0.15,
-        CloseButtonImage = config.CloseButtonImage or "rbxassetid://9886659671"
-    }
+    -- Background
+    self.background = Instance.new("Frame")
+    self.background.Name = "Background"
+    self.background.Size = UDim2.new(1, 0, 1, 0)
+    self.background.BackgroundColor3 = Color3.new(0, 0, 0)
+    self.background.BackgroundTransparency = 1
+    self.background.ZIndex = 1
+    self.background.Parent = self.gui
+    TweenService:Create(self.background, TweenInfo.new(0.15), {BackgroundTransparency = 0.25}):Play()
 
-    self:_createBackground()
-    self:_createCloseButton()
-    self:_createMainContainer()
+    -- Close Button
+    self.closeButton = Instance.new("ImageButton")
+    self.closeButton.Name = "CloseButton"
+    self.closeButton.Size = UDim2.new(0, 24, 0, 24)
+    self.closeButton.AnchorPoint = Vector2.new(1, 0)
+    self.closeButton.Position = UDim2.new(1, -10, 0, 10)
+    self.closeButton.BackgroundTransparency = 1
+    self.closeButton.Image = "rbxassetid://9886659671"
+    self.closeButton.ZIndex = 2
+    self.closeButton.Parent = self.gui
+    self.closeButton.MouseButton1Click:Connect(function() self.gui:Destroy() end)
+
+    -- Tabs Container
+    self.tabsFrame = Instance.new("Frame")
+    self.tabsFrame.Name = "TabsFrame"
+    self.tabsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.tabsFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.tabsFrame.Size = UDim2.new(0, 0, 0, 0)
+    self.tabsFrame.BackgroundTransparency = 1
+    self.tabsFrame.Parent = self.gui
+
+    self.tabsContainer = Instance.new("Frame")
+    self.tabsContainer.Name = "TabsContainer"
+    self.tabsContainer.Size = UDim2.new(1, 0, 1, 0)
+    self.tabsContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.tabsContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.tabsContainer.BackgroundTransparency = 1
+    self.tabsContainer.Parent = self.tabsFrame
+
+    TweenService:Create(self.tabsFrame, TweenInfo.new(0.15), {
+        Size = UDim2.new(0.9, 0, containerHeightScale, 0)
+    }):Play()
 
     return self
 end
 
-function QuantumUI:_createBackground()
-    self.Background = Instance.new("Frame")
-    self.Background.Name = "Background"
-    self.Background.Size = UDim2.new(1, 0, 1, 0)
-    self.Background.Position = UDim2.new(0, 0, 0, 0)
-    self.Background.BackgroundColor3 = Color3.new(0, 0, 0)
-    self.Background.BackgroundTransparency = 1
-    self.Background.ZIndex = 1
-    self.Background.Parent = self.Gui
-
-    TweenService:Create(self.Background, TweenInfo.new(self.Config.AnimationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundTransparency = self.Config.BackgroundTransparency
-    }):Play()
-end
-
-function QuantumUI:_createCloseButton()
-    self.CloseButton = Instance.new("ImageButton")
-    self.CloseButton.Name = "CloseButton"
-    self.CloseButton.Size = UDim2.new(0, 24, 0, 24)
-    self.CloseButton.AnchorPoint = Vector2.new(1, 0)
-    self.CloseButton.Position = UDim2.new(1, -10, 0, 10)
-    self.CloseButton.BackgroundTransparency = 1
-    self.CloseButton.Image = self.Config.CloseButtonImage
-    self.CloseButton.ZIndex = 2
-    self.CloseButton.Parent = self.Gui
-
-    self.CloseButton.MouseButton1Click:Connect(function()
-        self:Destroy()
-    end)
-end
-
-function QuantumUI:_createMainContainer()
-    self.MainContainer = Instance.new("Frame")
-    self.MainContainer.Name = "MainContainer"
-    self.MainContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
-    self.MainContainer.Size = UDim2.new(0, 0, 0, 0)
-    self.MainContainer.BackgroundTransparency = 1
-    self.MainContainer.Parent = self.Gui
-
-    self.TabsContainer = Instance.new("Frame")
-    self.TabsContainer.Name = "TabsContainer"
-    self.TabsContainer.Size = UDim2.new(1, 0, 1, 0)
-    self.TabsContainer.BackgroundTransparency = 1
-    self.TabsContainer.Parent = self.MainContainer
-
-    TweenService:Create(self.MainContainer, TweenInfo.new(self.Config.AnimationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0.9, 0, self.Config.TabHeightScale, 0)
-    }):Play()
-end
-
-function QuantumUI:AddTab(tabName)
-    local tab = {
-        Name = tabName,
-        Container = Instance.new("ScrollingFrame"),
-        Elements = {}
-    }
-
-    local tabFrame = Instance.new("Frame")
-    tabFrame.Name = tabName
-    tabFrame.Size = UDim2.new(1/#self.Tabs, 0, 1, 0)
-    tabFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-    tabFrame.BackgroundTransparency = 0.25
-    tabFrame.ZIndex = 2
-    tabFrame.Parent = self.TabsContainer
+function QuantumUI:createCategory(name)
+    table.insert(self.categories, name)
+    
+    local panel = Instance.new("Frame")
+    panel.Name = name
+    panel.AnchorPoint = Vector2.new(0, 0.5)
+    panel.Size = UDim2.new(0, 0, 1, 0)
+    panel.BackgroundColor3 = Color3.new(0, 0, 0)
+    panel.BackgroundTransparency = 1
+    panel.ZIndex = 1
+    panel.Parent = self.tabsContainer
 
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 24)
-    corner.Parent = tabFrame
+    corner.Parent = panel
 
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.new(0, 0, 0)
     stroke.Thickness = 1
-    stroke.Parent = tabFrame
+    stroke.Parent = panel
 
-    local header = Instance.new("TextLabel")
+    -- Header
+    local header = Instance.new("Frame")
     header.Name = "Header"
     header.Size = UDim2.new(1, 0, 0.15, 0)
-    header.Text = tabName
-    header.TextColor3 = Color3.new(1, 1, 1)
-    header.TextSize = 20
-    header.Font = Enum.Font.Gotham
     header.BackgroundTransparency = 1
-    header.Parent = tabFrame
+    header.Parent = panel
 
-    tab.Container.Name = "Content"
-    tab.Container.Size = UDim2.new(1, 0, 0.85, 0)
-    tab.Container.Position = UDim2.new(0, 0, 0.15, 0)
-    tab.Container.BackgroundTransparency = 1
-    tab.Container.ScrollBarThickness = 5
-    tab.Container.Parent = tabFrame
+    local label = Instance.new("TextLabel")
+    label.Text = name
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Font = Enum.Font.Gotham
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextSize = 20
+    label.BackgroundTransparency = 1
+    label.Parent = header
 
-    table.insert(self.Tabs, tab)
-    self:_updateTabSizes()
-    return tab
+    -- Content
+    local content = Instance.new("Frame")
+    content.Name = "Content"
+    content.Size = UDim2.new(1, 0, 0.85, 0)
+    content.Position = UDim2.new(0, 0, 0.15, 0)
+    content.BackgroundTransparency = 1
+    content.Parent = panel
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.Padding = UDim.new(0, 10)
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    listLayout.Parent = content
+
+    table.insert(self.tabPanels, panel)
+    self:_updateTabsLayout()
+    
+    TweenService:Create(panel, TweenInfo.new(0.15), {
+        BackgroundTransparency = 0.25
+    }):Play()
 end
 
-function QuantumUI:_updateTabSizes()
-    local spacing = 0.02
-    local totalSpacing = spacing * (#self.Tabs - 1)
-    local tabWidth = (1 - totalSpacing) / #self.Tabs
+function QuantumUI:_updateTabsLayout()
+    local numTabs = #self.categories
+    local totalSpacing = spacingScale * (numTabs - 1)
+    local tabWidthScale = (1 - totalSpacing) / numTabs
 
-    for i, tab in ipairs(self.Tabs) do
-        tab.Container.Parent.Size = UDim2.new(tabWidth, 0, 1, 0)
-        tab.Container.Parent.Position = UDim2.new((tabWidth + spacing) * (i - 1), 0, 0, 0)
+    for i, panel in ipairs(self.tabPanels) do
+        panel.Size = UDim2.new(tabWidthScale, 0, 1, 0)
+        panel.Position = UDim2.new((tabWidthScale + spacingScale) * (i - 1), 0, 0.5, 0)
     end
 end
 
-function QuantumUI:Destroy()
-    TweenService:Create(self.Background, TweenInfo.new(self.Config.AnimationDuration), {
-        BackgroundTransparency = 1
-    }):Play()
-    
-    self.Gui:Destroy()
-    setmetatable(self, nil)
+function QuantumUI:createButton(categoryName, buttonName, callback)
+    for _, panel in ipairs(self.tabPanels) do
+        if panel.Name == categoryName then
+            local content = panel:FindFirstChild("Content")
+            if content then
+                local button = Instance.new("TextButton")
+                button.Name = buttonName
+                button.Size = UDim2.new(0.95, 0, 0, 40)
+                button.Position = UDim2.new(0.025, 0, 0, 0)
+                button.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+                button.TextColor3 = Color3.new(1, 1, 1)
+                button.Text = buttonName
+                button.Font = Enum.Font.Gotham
+                button.TextSize = 16
+                button.AutoButtonColor = false
+                button.Parent = content
+
+                local corner = Instance.new("UICorner")
+                corner.CornerRadius = UDim.new(0, 8)
+                corner.Parent = button
+
+                button.MouseEnter:Connect(function()
+                    TweenService:Create(button, TweenInfo.new(0.1), {
+                        BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+                    }):Play()
+                end)
+
+                button.MouseLeave:Connect(function()
+                    TweenService:Create(button, TweenInfo.new(0.1), {
+                        BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+                    }):Play()
+                end)
+
+                button.MouseButton1Click:Connect(callback)
+                return button
+            end
+        end
+    end
 end
 
 return QuantumUI
