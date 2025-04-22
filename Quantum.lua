@@ -33,7 +33,7 @@ function Quantum.new(config)
         closeButtonColor = Color3.new(1, 1, 1),
         
         strokeColor = Color3.new(0, 0, 0),
-        font = Font.new("rbxassetid://11702779517"),
+        font = Font.new("rbxassetid://12187607287"),
         cornerRadiusScale = 0.08,
         textScaleCoefficient = 0.03
     }
