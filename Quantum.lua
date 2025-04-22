@@ -12,7 +12,7 @@ function Quantum.new(config)
     local defaultConfig = {
         animationType = "scale",
         animationDuration = 0.15,
-        tabNames = {"Combat", "Misc", "Settings"},
+        tabNames = {"Test"},
         spacing = 0.02,
         containerSize = UDim2.new(0.9, 0, 0.7, 0),
         backgroundTransparency = 0.25,
