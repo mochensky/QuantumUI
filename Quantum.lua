@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
 local Quantum = {}
 Quantum.__index = Quantum
@@ -8,7 +9,6 @@ Quantum.__index = Quantum
 function Quantum.new(config)
     local self = setmetatable({}, Quantum)
     
-    local player = Players.LocalPlayer
     local defaultConfig = {
         animationType = "scale",
         animationDuration = 0.15,
@@ -16,49 +16,35 @@ function Quantum.new(config)
         spacing = 0.02,
         containerSize = UDim2.new(0.9, 0, 0.6, 0),
         backgroundTransparency = 0.25,
-        closeButtonImage = "rbxassetid://9886659671",
-        closeButtonSize = UDim2.new(0, 24, 0, 24),
-        closeButtonPosition = UDim2.new(1, -10, 0, 10),
         backgroundColor = Color3.new(0, 0, 0),
         tabBackgroundTransparency = 0.25,
         strokeColor = Color3.new(0, 0, 0),
         textColor = Color3.new(1, 1, 1),
-        baseTextSize = 48,
         font = Font.new("rbxasset://fonts/families/GothamSSm.json"),
-        cornerRadius = UDim.new(0, 24),
-        zIndex = 1000
-    }
-    
-    local nonEditableParams = {
-        "closeButtonImage",
-        "closeButtonSize",
-        "closeButtonPosition",
-        "baseTextSize",
-        "zIndex"
+        cornerRadius = UDim.new(0, 24)
     }
     
     for k, v in pairs(defaultConfig) do
-        if table.find(nonEditableParams, k) then
-            self[k] = v
-        else
-            self[k] = config[k] or v
-        end
+        self[k] = config[k] or v
     end
+    
+    self.closeButtonImage = "rbxassetid://9886659671"
+    self.closeButtonSize = UDim2.new(0, 24, 0, 24)
+    self.closeButtonPosition = UDim2.new(1, -10, 0, 10)
+    self.baseTextSize = 48
     
     self.gui = Instance.new("ScreenGui")
     self.gui.Name = "QuantumInterface"
     self.gui.IgnoreGuiInset = true
     self.gui.ResetOnSpawn = false
     self.gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-    self.gui.Parent = player:WaitForChild("PlayerGui")
+    self.gui.Parent = CoreGui
     
     self.background = Instance.new("Frame")
     self.background.Name = "Background"
     self.background.Size = UDim2.new(1, 0, 1, 0)
     self.background.BackgroundColor3 = self.backgroundColor
     self.background.BackgroundTransparency = 1
-    self.background.ZIndex = self.zIndex
-    self.background.Active = true
     self.background.Parent = self.gui
     
     self.closeButton = Instance.new("ImageButton")
@@ -68,7 +54,6 @@ function Quantum.new(config)
     self.closeButton.Position = self.closeButtonPosition
     self.closeButton.BackgroundTransparency = 1
     self.closeButton.Image = self.closeButtonImage
-    self.closeButton.ZIndex = self.zIndex + 1
     self.closeButton.Parent = self.gui
     
     self.tabsFrame = Instance.new("Frame")
@@ -97,7 +82,6 @@ function Quantum.new(config)
         panel.Size = UDim2.new(tabWidth, 0, 1, 0)
         panel.BackgroundColor3 = self.backgroundColor
         panel.BackgroundTransparency = self.tabBackgroundTransparency
-        panel.ZIndex = self.zIndex
         panel.Parent = self.tabsContainer
         
         local corner = Instance.new("UICorner")
