@@ -90,9 +90,9 @@ function Quantum.new(config)
     self.searchTab.Name = "SearchTab"
     self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
     self.searchTab.Position = UDim2.new(0.5, 0, 0.1, 0)
-    self.searchTab.Size = UDim2.new(0.3, 0, 0.06, 0)
+    self.searchTab.Size = UDim2.new(0.2, 0, 0.06, 0)
     self.searchTab.BackgroundColor3 = self.searchTabBackgroundColor
-    self.searchTab.BackgroundTransparency = self.searchTabBackgroundTransparency
+    self.searchTab.BackgroundTransparency = 1
     self.searchTab.Parent = self.gui
 
     local searchCorner = Instance.new("UICorner")
@@ -101,7 +101,7 @@ function Quantum.new(config)
 
     local searchStroke = Instance.new("UIStroke")
     searchStroke.Color = self.searchStrokeColor
-    searchStroke.Thickness = 1
+    searchStroke.Thickness = 2
     searchStroke.Parent = self.searchTab
 
     self.searchBox = Instance.new("TextBox")
@@ -186,12 +186,12 @@ function Quantum.new(config)
     end
 
     self.searchBox.Focused:Connect(function()
-        animateSearchTab(0.4)
+        animateSearchTab(0.3)
     end)
 
     self.searchBox.FocusLost:Connect(function()
         if self.searchBox.Text == "" then
-            animateSearchTab(0.3)
+            animateSearchTab(0.2)
         end
     end)
     
@@ -208,22 +208,34 @@ end
 Quantum._initializeAnimation = function(self)
     self.targetSize = self.containerSize
     self.targetPosition = UDim2.new(0.5, 0, 0.5, 0)
+    self.searchTargetSize = UDim2.new(0.2, 0, 0.06, 0)
+    self.searchTargetPosition = UDim2.new(0.5, 0, 0.1, 0)
     
     if self.animationType == "scale" then
         self.tabsFrame.Size = UDim2.new(0, 0, 0, 0)
         self.tabsFrame.Position = self.targetPosition
+        self.searchTab.Size = UDim2.new(0, 0, 0, 0)
+        self.searchTab.Position = self.searchTargetPosition
     elseif self.animationType == "left" then
         self.tabsFrame.Size = self.targetSize
         self.tabsFrame.Position = UDim2.new(-self.targetSize.X.Scale / 2, 0, 0.5, 0)
+        self.searchTab.Size = self.searchTargetSize
+        self.searchTab.Position = UDim2.new(-self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)
     elseif self.animationType == "right" then
         self.tabsFrame.Size = self.targetSize
         self.tabsFrame.Position = UDim2.new(1 + self.targetSize.X.Scale / 2, 0, 0.5, 0)
+        self.searchTab.Size = self.searchTargetSize
+        self.searchTab.Position = UDim2.new(1 + self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)
     elseif self.animationType == "top" then
         self.tabsFrame.Size = self.targetSize
         self.tabsFrame.Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)
+        self.searchTab.Size = self.searchTargetSize
+        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale, 0)
     elseif self.animationType == "bottom" then
         self.tabsFrame.Size = self.targetSize
         self.tabsFrame.Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)
+        self.searchTab.Size = self.searchTargetSize
+        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale, 0)
     end
 end
 
@@ -237,6 +249,18 @@ Quantum.Open = function(self)
     else
         local positionTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = self.targetPosition})
         positionTween:Play()
+    end
+    
+    local searchTweens = {}
+    if self.animationType == "scale" then
+        table.insert(searchTweens, TweenService:Create(self.searchTab, tweenInfo, {Size = self.searchTargetSize}))
+    else
+        table.insert(searchTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = self.searchTargetPosition}))
+    end
+    table.insert(searchTweens, TweenService:Create(self.searchTab, tweenInfo, {BackgroundTransparency = self.searchTabBackgroundTransparency}))
+    
+    for _, tween in ipairs(searchTweens) do
+        tween:Play()
     end
     
     bgTween:Play()
@@ -257,6 +281,24 @@ Quantum.Close = function(self)
         closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)})
     elseif self.animationType == "bottom" then
         closeTween = TweenService:Create(self.tabsFrame, tweenInfo, {Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)})
+    end
+    
+    local searchCloseTweens = {}
+    if self.animationType == "scale" then
+        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(0, 0, 0, 0)}))
+    elseif self.animationType == "left" then
+        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(-self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)}))
+    elseif self.animationType == "right" then
+        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(1 + self.searchTargetSize.X.Scale, 0, self.searchTargetPosition.Y.Scale, 0)}))
+    elseif self.animationType == "top" then
+        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale, 0)}))
+    elseif self.animationType == "bottom" then
+        table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale, 0)}))
+    end
+    table.insert(searchCloseTweens, TweenService:Create(self.searchTab, tweenInfo, {BackgroundTransparency = 1}))
+    
+    for _, tween in ipairs(searchCloseTweens) do
+        tween:Play()
     end
     
     if closeTween then
