@@ -90,7 +90,7 @@ function Quantum.new(config)
     self.searchTab.Name = "SearchTab"
     self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
     self.searchTab.Position = UDim2.new(0.5, 0, 0.1, 0)
-    self.searchTab.Size = UDim2.new(0.2, 0, 0.06, 0)
+    self.searchTab.Size = UDim2.new(0.1, 0, 0.06, 0)
     self.searchTab.BackgroundColor3 = self.searchTabBackgroundColor
     self.searchTab.BackgroundTransparency = 1
     self.searchTab.Parent = self.gui
@@ -106,7 +106,7 @@ function Quantum.new(config)
 
     self.searchBox = Instance.new("TextBox")
     self.searchBox.Name = "SearchBox"
-    self.searchBox.Size = UDim2.new(0.9, 0, 0.8, 0)
+    self.searchBox.Size = UDim2.new(0.9, 0, 0.9, 0)
     self.searchBox.Position = UDim2.new(0.05, 0, 0.1, 0)
     self.searchBox.BackgroundTransparency = 1
     self.searchBox.TextColor3 = self.searchTextColor
@@ -191,7 +191,7 @@ function Quantum.new(config)
 
     self.searchBox.FocusLost:Connect(function()
         if self.searchBox.Text == "" then
-            animateSearchTab(0.2)
+            animateSearchTab(0.1)
         end
     end)
     
@@ -208,7 +208,7 @@ end
 Quantum._initializeAnimation = function(self)
     self.targetSize = self.containerSize
     self.targetPosition = UDim2.new(0.5, 0, 0.5, 0)
-    self.searchTargetSize = UDim2.new(0.2, 0, 0.06, 0)
+    self.searchTargetSize = UDim2.new(0.1, 0, 0.06, 0)
     self.searchTargetPosition = UDim2.new(0.5, 0, 0.1, 0)
     
     if self.animationType == "scale" then
