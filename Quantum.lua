@@ -186,7 +186,7 @@ function Quantum.new(config)
     end
 
     self.searchBox.Focused:Connect(function()
-        animateSearchTab(0.3)
+        animateSearchTab(0.25)
     end)
 
     self.searchBox.FocusLost:Connect(function()
