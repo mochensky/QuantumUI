@@ -94,7 +94,7 @@ function Quantum.new(config)
     self.searchBox = Instance.new("TextBox")
     self.searchBox.Name = "SearchBox"
     self.searchBox.Size = UDim2.new(0.9, 0, 0.8, 0)
-    self.searchBox.Position = UDim2.new(0.65, 0, 0.1, 0)
+    self.searchBox.Position = UDim2.new(0.05, 0, 0.1, 0)
     self.searchBox.BackgroundTransparency = 1
     self.searchBox.TextColor3 = self.textColor
     self.searchBox.TextSize = self:_calculateTextSize()
