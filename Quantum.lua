@@ -230,12 +230,12 @@ Quantum._initializeAnimation = function(self)
         self.tabsFrame.Size = self.targetSize
         self.tabsFrame.Position = UDim2.new(0.5, 0, -self.targetSize.Y.Scale / 2, 0)
         self.searchTab.Size = self.searchTargetSize
-        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale, 0)
+        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, -self.searchTargetSize.Y.Scale * 2, 0)
     elseif self.animationType == "bottom" then
         self.tabsFrame.Size = self.targetSize
         self.tabsFrame.Position = UDim2.new(0.5, 0, 1 + self.targetSize.Y.Scale / 2, 0)
         self.searchTab.Size = self.searchTargetSize
-        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale, 0)
+        self.searchTab.Position = UDim2.new(self.searchTargetPosition.X.Scale, 0, 1 + self.searchTargetSize.Y.Scale * 2, 0)
     end
 end
 
