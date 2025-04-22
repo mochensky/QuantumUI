@@ -34,7 +34,7 @@ function Quantum.new(config)
         
         strokeColor = Color3.new(0, 0, 0),
         font = Font.new("rbxassetid://12187607287"),
-        cornerRadiusScale = 0.07,
+        cornerRadiusScale = 0.08,
         textScaleCoefficient = 0.03
     }
     
@@ -96,7 +96,7 @@ function Quantum.new(config)
     self.searchTab.Parent = self.gui
 
     local searchCorner = Instance.new("UICorner")
-    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale * 6, 0)
+    searchCorner.CornerRadius = UDim.new(self.cornerRadiusScale * 8, 0)
     searchCorner.Parent = self.searchTab
 
     local searchStroke = Instance.new("UIStroke")
