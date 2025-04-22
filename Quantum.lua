@@ -1,59 +1,34 @@
 local Quantum = {}
-Quantum.__index = Quantum
 
-local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
-local DEFAULT_SETTINGS = {
-    animationType = "Scale", -- Scale, Top, Bottom, Left, Right
-    animationSpeed = 0.15,
-    backgroundTransparency = 0.25,
-    tabNames = {"Combat", "Misc", "Debug", "Test", "Settings"},
-    containerHeight = 0.6,
-    spacingScale = 0.02
-}
-
-function Quantum.new(options)
-    local self = setmetatable({}, Quantum)
-    self.settings = table.clone(DEFAULT_SETTINGS)
-    for k,v in pairs(options or {}) do
-        self.settings[k] = v
-    end
+function Quantum.New(config)
+    local self = {}
+    config = config or {}
     
-    self.gui = self:_createGui()
-    self:_setupAnimations()
-    return self
-end
-
-function Quantum:_createGui()
+    local animationDuration = config.AnimationDuration or 0.15
+    local containerHeight = config.ContainerHeight or 0.6
+    local tabSpacing = config.TabSpacing or 0.02
+    local mainColor = config.MainColor or Color3.new(0, 0, 0)
+    local textColor = config.TextColor or Color3.new(1, 1, 1)
+    
     local gui = Instance.new("ScreenGui")
     gui.Name = "QuantumUI"
     gui.IgnoreGuiInset = true
     gui.ResetOnSpawn = false
     gui.Parent = player:WaitForChild("PlayerGui")
-    gui.Enabled = true
-
-    self.background = self:_createBackground(gui)
-    self.closeButton = self:_createCloseButton(gui)
-    self.tabsFrame = self:_createTabsFrame(gui)
     
-    return gui
-end
-
-function Quantum:_createBackground(parent)
     local background = Instance.new("Frame")
     background.Name = "Background"
     background.Size = UDim2.new(1, 0, 1, 0)
-    background.BackgroundColor3 = Color3.new(0, 0, 0)
+    background.Position = UDim2.new(0, 0, 0, 0)
+    background.BackgroundColor3 = mainColor
     background.BackgroundTransparency = 1
     background.ZIndex = 1
-    background.Parent = parent
+    background.Parent = gui
     
-    return background
-end
-
-function Quantum:_createCloseButton(parent)
     local closeButton = Instance.new("ImageButton")
     closeButton.Name = "CloseButton"
     closeButton.Size = UDim2.new(0, 24, 0, 24)
@@ -62,26 +37,16 @@ function Quantum:_createCloseButton(parent)
     closeButton.BackgroundTransparency = 1
     closeButton.Image = "rbxassetid://9886659671"
     closeButton.ZIndex = 2
-    closeButton.Parent = parent
+    closeButton.Parent = gui
     
-    closeButton.MouseButton1Click:Connect(function()
-        self:destroy()
-    end)
-    
-    return closeButton
-end
-
-function Quantum:_createTabsFrame(parent)
     local tabsFrame = Instance.new("Frame")
     tabsFrame.Name = "TabsFrame"
     tabsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    tabsFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    tabsFrame.Size = UDim2.new(0, 0, 0, 0)
     tabsFrame.BackgroundTransparency = 1
-    tabsFrame.Parent = parent
-
-    local numTabs = #self.settings.tabNames
-    local totalSpacing = self.settings.spacingScale * (numTabs - 1)
-    local tabWidthScale = (1 - totalSpacing) / numTabs
-
+    tabsFrame.Parent = gui
+    
     local tabsContainer = Instance.new("Frame")
     tabsContainer.Name = "TabsContainer"
     tabsContainer.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -89,107 +54,105 @@ function Quantum:_createTabsFrame(parent)
     tabsContainer.Size = UDim2.new(1, 0, 1, 0)
     tabsContainer.BackgroundTransparency = 1
     tabsContainer.Parent = tabsFrame
-
-    for i, name in ipairs(self.settings.tabNames) do
+    
+    function self:Show()
+        TweenService:Create(background, TweenInfo.new(animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0.25
+        }):Play()
+        TweenService:Create(tabsFrame, TweenInfo.new(animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0.9, 0, containerHeight, 0)
+        }):Play()
+    end
+    
+    function self:Hide()
+        TweenService:Create(background, TweenInfo.new(animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 1
+        }):Play()
+        TweenService:Create(tabsFrame, TweenInfo.new(animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 0, 0, 0)
+        }):Play()
+    end
+    
+    function self:Destroy()
+        gui:Destroy()
+    end
+    
+    function self:AddTab(tabName)
+        local tab = {}
         local panel = Instance.new("Frame")
-        panel.Name = name
-        panel.AnchorPoint = Vector2.new(0, 0.5)
-        panel.Position = UDim2.new((tabWidthScale + self.settings.spacingScale) * (i - 1), 0, 0.5, 0)
-        panel.Size = UDim2.new(tabWidthScale, 0, 1, 0)
-        panel.BackgroundColor3 = Color3.new(0, 0, 0)
+        panel.Name = tabName
+        panel.BackgroundColor3 = mainColor
         panel.BackgroundTransparency = 1
         panel.ZIndex = 1
-        panel.Parent = tabsContainer
-
+        
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 24)
         corner.Parent = panel
-
+        
         local stroke = Instance.new("UIStroke")
-        stroke.Color = Color3.new(0, 0, 0)
+        stroke.Color = mainColor
         stroke.Thickness = 1
         stroke.Parent = panel
-
-        -- Add header and content (similar to original code)
+        
+        local header = Instance.new("Frame")
+        header.Name = "Header"
+        header.Size = UDim2.new(1, 0, 0.15, 0)
+        header.BackgroundTransparency = 1
+        header.Parent = panel
+        
+        local label = Instance.new("TextLabel")
+        label.Name = "Label"
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Text = tabName
+        label.TextColor3 = textColor
+        label.TextSize = 20
+        label.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+        label.Parent = header
+        
+        local content = Instance.new("Frame")
+        content.Name = "Content"
+        content.Size = UDim2.new(1, 0, 0.85, 0)
+        content.Position = UDim2.new(0, 0, 0.15, 0)
+        content.BackgroundTransparency = 1
+        content.Parent = panel
+        
+        function tab:AddButton(buttonConfig)
+            local button = Instance.new("TextButton")
+            button.Name = buttonConfig.Name
+            button.Size = UDim2.new(1, 0, 0, 40)
+            button.BackgroundColor3 = mainColor
+            button.BackgroundTransparency = 0.5
+            button.TextColor3 = textColor
+            button.Text = buttonConfig.Text
+            button.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+            button.Parent = content
+            
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 8)
+            corner.Parent = button
+            
+            if buttonConfig.Callback then
+                button.MouseButton1Click:Connect(buttonConfig.Callback)
+            end
+            
+            return button
+        end
+        
+        panel.Parent = tabsContainer
+        return tab
     end
-
-    return tabsFrame
-end
-
-function Quantum:_setupAnimations()
-    -- Initial positions and sizes
-    self.original = {
-        backgroundTransparency = self.settings.backgroundTransparency,
-        tabsSize = UDim2.new(0.9, 0, self.settings.containerHeight, 0),
-        tabsPosition = UDim2.new(0.5, 0, 0.5, 0)
-    }
-
-    -- Set initial state based on animation type
-    local animationType = self.settings.animationType
-    local startState = {
-        BackgroundTransparency = 1
-    }
-
-    if animationType == "Scale" then
-        self.tabsFrame.Size = UDim2.new(0, 0, 0, 0)
-    elseif animationType == "Top" then
-        self.tabsFrame.Position = UDim2.new(0.5, 0, 0, -self.tabsFrame.AbsoluteSize.Y)
-    elseif animationType == "Bottom" then
-        self.tabsFrame.Position = UDim2.new(0.5, 0, 1, self.tabsFrame.AbsoluteSize.Y)
-    elseif animationType == "Left" then
-        self.tabsFrame.Position = UDim2.new(-0.5, -self.tabsFrame.AbsoluteSize.X, 0.5, 0)
-    elseif animationType == "Right" then
-        self.tabsFrame.Position = UDim2.new(1.5, self.tabsFrame.AbsoluteSize.X, 0.5, 0)
-    end
-
-    -- Animate in
-    local tweenInfo = TweenInfo.new(
-        self.settings.animationSpeed,
-        Enum.EasingStyle.Quad,
-        Enum.EasingDirection.Out
-    )
-
-    local backgroundTween = TweenService:Create(self.background, tweenInfo, {
-        BackgroundTransparency = self.settings.backgroundTransparency
+    
+    closeButton.MouseButton1Click:Connect(function()
+        self:Destroy()
+    end)
+    
+    setmetatable(self, {
+        __index = Quantum,
+        __tostring = function() return "QuantumUI" end
     })
     
-    local tabsTween = TweenService:Create(self.tabsFrame, tweenInfo, {
-        Size = self.original.tabsSize,
-        Position = self.original.tabsPosition
-    })
-
-    backgroundTween:Play()
-    tabsTween:Play()
-end
-
-function Quantum:destroy()
-    local animationType = self.settings.animationType
-    local tweenInfo = TweenInfo.new(
-        self.settings.animationSpeed,
-        Enum.EasingStyle.Quad,
-        Enum.EasingDirection.In
-    )
-
-    -- Reverse animations
-    local backgroundTween = TweenService:Create(self.background, tweenInfo, {
-        BackgroundTransparency = 1
-    })
-
-    local tabsTween = TweenService:Create(self.tabsFrame, tweenInfo, {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = if animationType == "Scale" then self.original.tabsPosition
-            elseif animationType == "Top" then UDim2.new(0.5, 0, 0, -self.tabsFrame.AbsoluteSize.Y)
-            elseif animationType == "Bottom" then UDim2.new(0.5, 0, 1, self.tabsFrame.AbsoluteSize.Y)
-            elseif animationType == "Left" then UDim2.new(-0.5, -self.tabsFrame.AbsoluteSize.X, 0.5, 0)
-            else UDim2.new(1.5, self.tabsFrame.AbsoluteSize.X, 0.5, 0)
-    })
-
-    backgroundTween:Play()
-    tabsTween:Play()
-
-    -- Destroy after animation
-    tabsTween.Completed:Wait()
-    self.gui:Destroy()
+    return self
 end
 
 return Quantum
