@@ -75,11 +75,11 @@ function Quantum.new(config)
     self.searchTab = Instance.new("Frame")
     self.searchTab.Name = "SearchTab"
     self.searchTab.AnchorPoint = Vector2.new(0.5, 0)
-    self.searchTab.Position = UDim2.new(0.5, 0, 0.4, 0)
-    self.searchTab.Size = UDim2.new(0.2, 0, 0.05, 0)
-    self.searchTab.BackgroundColor3 = self.backgroundColor
-    self.searchTab.BackgroundTransparency = self.tabBackgroundTransparency
-    self.searchTab.ZIndex = 2
+    self.searchTab.Position = UDim2.new(0.5, 0, 0.35, 0)
+    self.searchTab.Size = UDim2.new(0.3, 0, 0.06, 0)
+    self.searchTab.BackgroundColor3 = Color3.new(1, 0, 0)
+    self.searchTab.BackgroundTransparency = 0
+    self.searchTab.ZIndex = 999
     self.searchTab.Parent = self.gui
 
     local searchCorner = Instance.new("UICorner")
@@ -88,17 +88,18 @@ function Quantum.new(config)
 
     local searchStroke = Instance.new("UIStroke")
     searchStroke.Color = self.strokeColor
-    searchStroke.Thickness = 1
+    searchStroke.Thickness = 2
     searchStroke.Parent = self.searchTab
 
     self.searchBox = Instance.new("TextBox")
     self.searchBox.Name = "SearchBox"
-    self.searchBox.Size = UDim2.new(1, 0, 1, 0)
+    self.searchBox.Size = UDim2.new(0.9, 0, 0.8, 0)
+    self.searchBox.Position = UDim2.new(0.05, 0, 0.1, 0)
     self.searchBox.BackgroundTransparency = 1
     self.searchBox.TextColor3 = self.textColor
     self.searchBox.TextSize = self:_calculateTextSize()
     self.searchBox.FontFace = self.font
-    self.searchBox.PlaceholderText = "Search..."
+    self.searchBox.PlaceholderText = "Поиск..."
     self.searchBox.Parent = self.searchTab
 
     table.insert(self.labels, self.searchBox)
@@ -165,7 +166,7 @@ function Quantum.new(config)
 
     local function animateSearchTab(width)
         local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local tween = TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(width, 0, 0.05, 0)})
+        local tween = TweenService:Create(self.searchTab, tweenInfo, {Size = UDim2.new(width, 0, 0.06, 0)})
         tween:Play()
     end
 
@@ -175,21 +176,21 @@ function Quantum.new(config)
 
     self.searchBox.FocusLost:Connect(function()
         if self.searchBox.Text == "" then
-            animateSearchTab(0.2)
+            animateSearchTab(0.3)
         end
     end)
     
     return self
 end
 
-function Quantum:_calculateTextSize()
+Quantum._calculateTextSize = function(self)
     if not self.viewportHeight then
         self.viewportHeight = workspace.CurrentCamera.ViewportSize.Y
     end
     return self.textScaleCoefficient * self.viewportHeight
 end
 
-function Quantum:_initializeAnimation()
+Quantum._initializeAnimation = function(self)
     self.targetSize = self.containerSize
     self.targetPosition = UDim2.new(0.5, 0, 0.5, 0)
     
@@ -211,7 +212,7 @@ function Quantum:_initializeAnimation()
     end
 end
 
-function Quantum:Open()
+Quantum.Open = function(self)
     local tweenInfo = TweenInfo.new(self.animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     local bgTween = TweenService:Create(self.background, tweenInfo, {BackgroundTransparency = self.backgroundTransparency})
     
@@ -226,7 +227,7 @@ function Quantum:Open()
     bgTween:Play()
 end
 
-function Quantum:Close()
+Quantum.Close = function(self)
     local tweenInfo = TweenInfo.new(self.animationDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
     local bgTween = TweenService:Create(self.background, tweenInfo, {BackgroundTransparency = 1})
     
@@ -252,7 +253,7 @@ function Quantum:Close()
     bgTween:Play()
 end
 
-function Quantum:Destroy()
+Quantum.Destroy = function(self)
     if self.viewportConnection then
         self.viewportConnection:Disconnect()
     end
