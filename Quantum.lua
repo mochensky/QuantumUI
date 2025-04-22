@@ -22,7 +22,7 @@ function Quantum.new(config)
         textColor = Color3.new(1, 1, 1),
         font = Font.new("rbxassetid://12187607287"),
         cornerRadiusScale = 0.1,
-        textScaleCoefficient = 0.03
+        textScaleCoefficient = 0.1 -- 0.03
     }
     
     for k, v in pairs(defaultConfig) do
